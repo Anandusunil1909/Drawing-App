@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DrawingPage extends StatefulWidget {
   @override
@@ -26,6 +27,7 @@ class _DrawingPageState extends State<DrawingPage> {
 
   Future<void> save() async {
     try {
+      Permission.manageExternalStorage.request();
       RenderRepaintBoundary boundary = _globalKey.currentContext.findRenderObject() as RenderRepaintBoundary;
       ui.Image image = await boundary.toImage();
       ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -52,6 +54,7 @@ class _DrawingPageState extends State<DrawingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.yellow[50],
       body: Stack(
         children: [
           buildAllPaths(context),
@@ -63,18 +66,19 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  GestureDetector buildCurrentPath(BuildContext context) {
+  Widget buildCurrentPath(BuildContext context) {
     return GestureDetector(
       onPanStart: onPanStart,
       onPanUpdate: onPanUpdate,
       onPanEnd: onPanEnd,
       child: RepaintBoundary(
+
         child: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.all(4.0),
-          alignment: Alignment.topLeft,
           color: Colors.transparent,
+          alignment: Alignment.topLeft,
           child: StreamBuilder<DrawnLine>(
             stream: currentLineStreamController.stream,
             builder: (context, snapshot) {
@@ -90,15 +94,15 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  RepaintBoundary buildAllPaths(BuildContext context) {
+  Widget buildAllPaths(BuildContext context) {
     return RepaintBoundary(
       key: _globalKey,
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
+        color: Colors.transparent,
         padding: EdgeInsets.all(4.0),
         alignment: Alignment.topLeft,
-        color: Colors.yellow[50],
         child: StreamBuilder<List<DrawnLine>>(
           stream: linesStreamController.stream,
           builder: (context, snapshot) {
@@ -113,32 +117,28 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  onPanStart(DragStartDetails details) {
+  void onPanStart(DragStartDetails details) {
     RenderBox box = context.findRenderObject();
-    Offset point;
-
-    point = box.globalToLocal(details.globalPosition);
+    Offset point = box.globalToLocal(details.globalPosition);
     line = DrawnLine([point], selectedColor, selectedWidth);
   }
 
-  onPanUpdate(DragUpdateDetails details) {
+  void onPanUpdate(DragUpdateDetails details) {
     RenderBox box = context.findRenderObject();
-    Offset point;
-
-    point = box.globalToLocal(details.globalPosition);
+    Offset point = box.globalToLocal(details.globalPosition);
 
     List<Offset> path = List.from(line.path)..add(point);
     line = DrawnLine(path, selectedColor, selectedWidth);
     currentLineStreamController.add(line);
   }
 
-  onPanEnd(DragEndDetails details) {
+  void onPanEnd(DragEndDetails details) {
     lines = List.from(lines)..add(line);
 
     linesStreamController.add(lines);
   }
 
-  Positioned buildStrokeToolbar() {
+  Widget buildStrokeToolbar() {
     return Positioned(
       bottom: 100.0,
       right: 10.0,
@@ -154,23 +154,25 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  GestureDetector buildStrokeButton(double strokeWidth) {
+  Widget buildStrokeButton(double strokeWidth) {
     return GestureDetector(
       onTap: () {
-        selectedWidth = strokeWidth;
+        setState(() {
+          selectedWidth = strokeWidth;
+        });
       },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Container(
           width: strokeWidth * 2,
           height: strokeWidth * 2,
-          decoration: BoxDecoration(color: selectedColor, borderRadius: BorderRadius.circular(12.0)),
+          decoration: BoxDecoration(color: selectedColor, borderRadius: BorderRadius.circular(50.0)),
         ),
       ),
     );
   }
 
-  Positioned buildColorToolbar() {
+  Widget buildColorToolbar() {
     return Positioned(
       top: 40.0,
       right: 10.0,
@@ -198,7 +200,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  Padding buildColorButton(Color color) {
+  Widget buildColorButton(Color color) {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: FloatingActionButton(
@@ -214,7 +216,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  GestureDetector buildSaveButton() {
+  Widget buildSaveButton() {
     return GestureDetector(
       onTap: save,
       child: CircleAvatar(
@@ -227,7 +229,7 @@ class _DrawingPageState extends State<DrawingPage> {
     );
   }
 
-  GestureDetector buildClearButton() {
+  Widget buildClearButton() {
     return GestureDetector(
       onTap: clear,
       child: CircleAvatar(
