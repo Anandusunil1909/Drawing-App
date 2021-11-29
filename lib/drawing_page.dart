@@ -19,8 +19,8 @@ class _DrawingPageState extends State<DrawingPage> {
   GlobalKey _globalKey = new GlobalKey();
   List<DrawnLine> lines = <DrawnLine>[];
   DrawnLine line;
-  Color selectedColor = Colors.black;
-  double selectedWidth = 5.0;
+  Color selectedColor = Colors.black; // Selects the color of the line
+  double selectedWidth = 3.0; // Selects the width of line
 
   StreamController<List<DrawnLine>> linesStreamController = StreamController<List<DrawnLine>>.broadcast();
   StreamController<DrawnLine> currentLineStreamController = StreamController<DrawnLine>.broadcast();
@@ -54,13 +54,13 @@ class _DrawingPageState extends State<DrawingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[50],
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           buildAllPaths(context),
           buildCurrentPath(context),
-          buildStrokeToolbar(),
-          buildColorToolbar(),
+          //buildStrokeToolbar(),
+           buildColorToolbar(),
         ],
       ),
     );
@@ -100,7 +100,7 @@ class _DrawingPageState extends State<DrawingPage> {
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        color: Colors.transparent,
+        color: Colors.white,
         padding: EdgeInsets.all(4.0),
         alignment: Alignment.topLeft,
         child: StreamBuilder<List<DrawnLine>>(
@@ -146,9 +146,9 @@ class _DrawingPageState extends State<DrawingPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          buildStrokeButton(5.0),
-          buildStrokeButton(10.0),
-          buildStrokeButton(15.0),
+          //buildStrokeButton(5.0),
+          //buildStrokeButton(10.0),
+          //buildStrokeButton(15.0),
         ],
       ),
     );
@@ -188,13 +188,12 @@ class _DrawingPageState extends State<DrawingPage> {
           Divider(
             height: 20.0,
           ),
-          buildColorButton(Colors.red),
-          buildColorButton(Colors.blueAccent),
-          buildColorButton(Colors.deepOrange),
-          buildColorButton(Colors.green),
-          buildColorButton(Colors.lightBlue),
-          buildColorButton(Colors.black),
-          buildColorButton(Colors.white),
+          //buildColorButton(Colors.white),
+          // buildColorButton(Colors.deepOrange),
+          // buildColorButton(Colors.green),
+          // buildColorButton(Colors.lightBlue),
+          // buildColorButton(Colors.black),
+          // buildColorButton(Colors.white),
         ],
       ),
     );
